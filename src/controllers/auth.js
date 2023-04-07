@@ -5,9 +5,6 @@ const errorMiddleware = require('../middleware/errorMiddleware');
 
 
 
-
-
-
 //Generate Token
 const generateToken = (id, name)=> {
     return jwt.sign({id,name},process.env.JWT_SECRET, {expiresIn: '7d'});
@@ -26,7 +23,7 @@ const setCookie = (res,token)=> {
 
 //Test
 exports.index = (req, res)=> {
-    res.send('<h2>Welcome To My Portfolio Application</h2>');
+    res.send('<h2>Welcome To My Lead Car Application</h2>');
 }
 
 
@@ -59,7 +56,10 @@ exports.register = async(req, res)=> {
         setCookie(res, token);
 
         if(user){
-            res.status(201).json(user)
+            res.status(201).json({
+                user:user, 
+                message: 'User registered successfully'
+            })
         }else{
             res.status(400);
             throw new Error("Invalid user data");    
@@ -78,7 +78,7 @@ exports.login = async(req,res)=> {
     try{
         const {username, password} = req.body;
 
-        if(!username, !password){
+        if(!username.trim(), !password.trim()){
             res.status(400);
             throw new Error('Please add username and password');
         }
@@ -154,12 +154,11 @@ exports.updateProfile = async(req, res)=> {
         const user = await User.findById(req.auth.id);
 
         if(user){
-            const {name, email, password, mobile} = user;
+            const {username, password} = user;
     
-            user.name = req.body.name || name;
-            user.email = req.body.email || email;
+            user.username = req.body.username || username;         
             user.password = req.body.password || password;
-            user.mobile = req.body.mobile || mobile;
+         
                        
             const userUpdate = await user.save();
             res.status(200).json(userUpdate);
